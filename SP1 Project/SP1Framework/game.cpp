@@ -53,9 +53,13 @@ void init()
 		unit[i].active = false;
 		unit[i].spawnLocation.Y = 1;//each unit Y is 0
 		unit[i].location.Y = unit[i].spawnLocation.Y;
-		unit[i].point.Y = 0;
 		unit[i].stop_Timer = 0;
 		unit[i].mobile = true;
+		
+		for(int j=0; j<10; ++j)
+		{
+			unit[i].point.push_back(charLocation);//push in char location to populate vector first
+		}
 	}
 
 	//set the spawn location for now
@@ -71,16 +75,11 @@ void init()
 	for(int i=0; i<8; ++i)
 	{
 		unit[i].location.X = unit[i].spawnLocation.X;
+		unit[i].count = 0;//set counter to 0
 	}
 
-	//set all the target points first
-
-	//set the X and Y coor of each target points first
-	for(int i=0; i<8; ++i)
-	{
-		unit[i].point.Y = rand() % 5 + 1;//increments by 5 each time target point is reached to form a new Y coor of a new target point
-		targetPoint(unit[i]);//set units target points
-	}
+	//preset target location
+	targetPoint(unit);
 }
 
 void shutdown()

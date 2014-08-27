@@ -83,33 +83,34 @@ void enemyUnitAi(double time, enemy& unit)
 			body.Y++;
 		}
 	}/**/
-	if(unit.location.Y != unit.point.Y)
+	/** if not reach the 7th preset point yet **/
+
+	if(unit.location.Y != unit.point[unit.count].Y && unit.count < 10)
 	{
 		unit.location.Y++;
 	}
 
 	//if reached the X coor but not the Y coor of the target point and not the player line
 	//if not reach the X coor of the target point and not reach player line
-	if(unit.location.X != unit.point.X  && unit.location.Y == unit.point.Y && unit.point.Y != 35)
+	if(unit.location.X != unit.point[unit.count].X && unit.location.Y == unit.point[unit.count].Y && unit.count < 10)
 	{
 		//if the target point X coor is bigger than the spawn point X coor
-		if(unit.location.X < unit.point.X)
+		if(unit.location.X < unit.point[unit.count].X)
 		{
 			unit.location.X++;
 		}
-		if(unit.location.X > unit.point.X)
+		if(unit.location.X > unit.point[unit.count].X )
 		{
 			unit.location.X--;
 		}
 	}
 
 		//if reached target point, call to set new target point and not reach player line
-	if(unit.location.X == unit.point.X && unit.location.Y == unit.point.Y && unit.point.Y != 35)
+	if(unit.location.X == unit.point[unit.count].X  && unit.location.Y == unit.point[unit.count].Y && unit.count < 10)
 	{
 		unit.mobile = false;//if false, can fire bullets
 		//unit.stop_Timer = time + (rand() % 3 + 1);//can stop from 1 to 3 seconds;
-		targetPoint(unit);
-
+		unit.count++;//increment the counter to refer to another preset target point
 	}
 }
 
@@ -157,28 +158,35 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit)
 			unit[i].location.X = unit[i].spawnLocation.X;
 		}
 		//reset the target points (including the Y coor individually)
-		
 		for(int i=0; i<8; ++i)
 		{
-			unit[i].point.Y = rand() % 5 + 1;
-			targetPoint(unit[i]);
+			unit[i].count = 0;//set counter to 0
 		}
-
+		targetPoint(unit);
 		respawn = currentTime + 2;//respawn time reset for further references
 	}
 
 	return respawn;//return start spawn time
 }
 
-void targetPoint(enemy& unit)
+void targetPoint(vector<enemy>& unit)
 {
 	int gridX = consoleSize.X / 8;//the length of each grid
-	//loop through all units
-	int X = unit.spawnLocation.X + gridX / 2;//X is the rightmost point of the grid of the respective enemy unit
-	//store the target point for each enemy unit
-	unit.point.X = rand() % 9 + (X - 10);//does not need
-	unit.point.Y += 3;//everytime set new target point, enemy unit will move 5 pixels towards player
+	//loop through all units, 8 units
+	for(int i=0; i<8; ++i)
+	{
+		static int three = rand() % 5 + 1;//set each time advance down 3 pixel
+		int X = unit[i].spawnLocation.X + gridX / 2;//X is the rightmost point of the grid of the respective enemy unit
+		//store the target point for each enemy unit
+		for(int j = 0; j<10; ++j)//modify to set 7 preset points
+		{
+			unit[i].point[j].X = rand() % 9 + (X - 10);//does not need
+			unit[i].point[j].Y = three;//everytime set new target point, enemy unit will move 5 pixels towards player
+			three += 3;
+		}
 
+		three = 3;//set back to 3
+	}
 }
 
 void printEnemy(COORD body)
