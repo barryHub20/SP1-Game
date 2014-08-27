@@ -116,6 +116,7 @@ void enemyUnitAi(double time, enemy& unit)
 double isEnemyAlive(double currentTime, vector<enemy>& unit)
 {
 	//simulate if all enemy unit died when reach Y = 30 (add score function to count score)
+	//for enemy to die, make sure THAT UNIT.ACTIVE IS TRUE, even if false, units are initialiszed in their respective spawn points and if bullets hit it, scores
 	for(int i=0; i<8; ++i)
 	{
 		if(unit[i].location.Y >= 30)
@@ -125,7 +126,7 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit)
 	}
 
 
-	static double respawn = 4;//set to 4 first
+	static double respawn = 2;//set to 4 first
 	
 	bool reset = false;//if true, reset all x and y of units (all units died)
 
@@ -148,19 +149,18 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit)
 		for(int i=0; i<8; ++i)
 		{
 			//if wave preiod ended and unit died before
-				//reset enemy active to true
-				unit[i].active = true;
-				//reset each enemy unit spawn point Y
-				unit[i].location.Y = unit[i].spawnLocation.Y;
-				//reset each enemy unit spawn point X
-				unit[i].location.X = unit[i].spawnLocation.X;
+			//reset enemy active to true
+			unit[i].active = true;
+			//reset each enemy unit spawn point Y
+			unit[i].location.Y = unit[i].spawnLocation.Y;
+			//reset each enemy unit spawn point X
+			unit[i].location.X = unit[i].spawnLocation.X;
 		}
 		//reset the target points (including the Y coor individually)
 		
 		for(int i=0; i<8; ++i)
 		{
 			unit[i].point.Y = rand() % 5 + 1;
-			unit[i].mobile = true;
 			targetPoint(unit[i]);
 		}
 
@@ -172,11 +172,6 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit)
 
 void targetPoint(enemy& unit)
 {
-	//Grid 1: 1px - 5px 
-	//Grid 2: 6 px - 10px
-	//Grid 3: 11px - 15px
-	//Grid 4: 16px - 20px
-	//Grid 5: 21px - 25px
 	int gridX = consoleSize.X / 8;//the length of each grid
 	//loop through all units
 	int X = unit.spawnLocation.X + gridX / 2;//X is the rightmost point of the grid of the respective enemy unit

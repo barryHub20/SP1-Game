@@ -50,7 +50,7 @@ void init()
 	for(int i=0; i<8; ++i)
 	{
 		unit.push_back(enemy());//push back empty enemy struct to populate it
-		unit[i].active = true;
+		unit[i].active = false;
 		unit[i].spawnLocation.Y = 1;//each unit Y is 0
 		unit[i].location.Y = unit[i].spawnLocation.Y;
 		unit[i].point.Y = 0;
@@ -152,20 +152,6 @@ void render()
      // clear previous screen
     colour(0x0F);
     cls();
-
-    //render test screen code (not efficient at all)
-    const WORD colors[] =   {
-	                        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-	                        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-	                        };
-	
-	for (int i = 0; i < 7; ++i)
-	{
-		gotoXY(i*12, 4);
-		colour(colors[5]);
-		std::cout << "Hit";
-	}
-
 
     // render time taken to calculate this frame
     gotoXY(70, 0);
