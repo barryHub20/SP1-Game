@@ -9,8 +9,6 @@
 using std::string;
 
 void MainMenu();
-void Pause();
 void HighScore();
-void mainmenupause();
 
 #endif

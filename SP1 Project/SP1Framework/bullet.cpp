@@ -8,12 +8,10 @@
 #include <vector>
 using std::vector;
 
-
 /**
-void bulletmovement(vector<projectile>& bullet, COORD consoleSize)
-{
-	abletoshootsatu(bullet); //Check if the player can shoot
 
+void bulletMovement(projectile& bullet)
+{
 	for (int c = 0; c < bullet.size(); c++)
 	{
 		if (bullet[c].bulletCoordinate.Y >= 0)//If bullet never touch screen keep moving up
@@ -22,12 +20,12 @@ void bulletmovement(vector<projectile>& bullet, COORD consoleSize)
 		}
 		else if (bullet[c].bulletCoordinate.Y == 1)//If bullet touch screen maker it false to stop redndering it
 		{
-			bullet.erase (bullet.begin());
+			//bullet.erase (bullet.begin());
 			//bullet[c].bulletcount -= 1;
 		}
 	}
 }
-
+/**
 void abletoshootsatu(vector<projectile>& bullet)
 {
 	for (int b = 0; b < bullet.size(); b++)

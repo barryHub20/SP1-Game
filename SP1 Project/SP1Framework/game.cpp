@@ -1,6 +1,7 @@
 // This is the main file for the game logic and function
 //
 //
+#include "powerUp.h"
 #include "game.h"
 #include "bullet.h"
 #include "Framework\console.h"
@@ -12,23 +13,26 @@
 
 double elapsedTime;
 double deltaTime;
+double velocity = 0.2;
 bool keyPressed[K_COUNT];
 COORD charLocation;
 COORD consoleSize;
 COORD playerDirection;
-vector<enemy> unit;
-
+int ammoSize;
+int enemySize = 8;
+vector<enemy> unit(enemySize);
+vector<projectile> bullet(ammoSize);
 
 void init()
 {
-	srand (time(NULL));
+	srand (time(NULL));//random seed generator
     // Set precision for floating point output
     std::cout << std::fixed << std::setprecision(3);
 
-    SetConsoleTitle(L"SP1 Framework");
+    SetConsoleTitle(L"Hitler");
 
     // Sets the console size, this is the biggest so far.
-    setConsoleSize(80, 40);//original: X 79  Y 28
+    setConsoleSize(80, 45);//original: X 79  Y 28
 
     // Get console width and height
     CONSOLE_SCREEN_BUFFER_INFO csbi; /* to get buffer info */     
@@ -45,15 +49,15 @@ void init()
     elapsedTime = 0.0;
 
 	
+	//enemy size
+	//enemySize = 8;
 	//initialize enemy unit spawn points first time round (total of 7 enemy units), read from text file
 	//set all enemy units to true first time round
-	for(int i=0; i<8; ++i)
+	for(int i=0; i<enemySize; ++i)
 	{
-		unit.push_back(enemy());//push back empty enemy struct to populate it
 		unit[i].active = false;
 		unit[i].spawnLocation.Y = 1;//each unit Y is 0
 		unit[i].location.Y = unit[i].spawnLocation.Y;
-		unit[i].stop_Timer = 0;
 		unit[i].mobile = true;
 		
 		for(int j=0; j<10; ++j)
@@ -72,7 +76,7 @@ void init()
 	unit[6].spawnLocation.X = 55;
 	unit[7].spawnLocation.X = 75;
 
-	for(int i=0; i<8; ++i)
+	for(int i=0; i<enemySize; ++i)
 	{
 		unit[i].location.X = unit[i].spawnLocation.X;
 		unit[i].count = 0;//set counter to 0
@@ -80,6 +84,15 @@ void init()
 
 	//preset target location
 	targetPoint(unit);
+
+	//set number of ammo per shot
+	ammoSize = 2;
+	/**
+	//initialize the timer for buffs
+	powerupBullet.timer = 0.0;
+	healthPack.timer = 0.0;
+	**/
+
 }
 
 void shutdown()
@@ -100,6 +113,11 @@ void getInput()
 
 void update(double dt)
 {
+
+	// timer for buffs
+	powerupBullet.timer += dt;
+	healthPack.timer += dt;
+
    // get the delta time
     elapsedTime += dt;
     deltaTime = dt;
@@ -141,9 +159,29 @@ void update(double dt)
     // quits the game if player hits the escape key
     if (keyPressed[K_ESCAPE])
         g_quitGame = true;    
+	/**
+	//updates bullets
+	if (keyPressed[K_SPACE])
+    {
+		static int a = 0;//counter to store the ammo amount and access individual bullet elements
+		if(a != ammoSize)
+		{
+			bulletMovement(bullet[a]);
+			a++;
+		}
+		else
+		{
+			
+		}
+    }/**/
+
 
 	//updates enemy movement, parameter is enemy unit, double elapsedTime, COORD consoleSize
-	enemyMovement(unit, elapsedTime, consoleSize);
+	enemyMovement(unit, elapsedTime, consoleSize, enemySize, velocity);
+
+	//health();
+
+	//powerup();
 }
 
 void render()
@@ -206,13 +244,17 @@ void render()
 	}
 
     //render the game
-	for(int i=0; i<8; ++i)
+	for(int i=0; i<enemySize; ++i)
 	{//psss in the X and Y coor. of each unit
 		if(unit[i].active == true)
 		{
 			printEnemy(unit[i].location);
 		}
 	}	
+
+	//printPowerUp();
+
+	//printHealth();
 }
 
 

@@ -113,14 +113,3 @@ void MainMenu()
 		Sleep(150);
 	}
 }
-
-void Pause()
-{
-
-}
-
-void mainmenupause()
-{
-
-
-}

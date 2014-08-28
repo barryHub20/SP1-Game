@@ -10,22 +10,21 @@ struct enemy
 {
 	bool active;//check if coorosponding unit is active
 	bool mobile;//if not mobile, if false, fire bullet
-	double stop_Timer;//stop time when reach target point
 	COORD spawnLocation;//store the spawn location of each unit
 	COORD location;//store corrosponding X and Y locations of each enemy unit's body
 	vector<COORD> point;//preset target point
-	double velocity;//enemy velocity
+	double time;//enemy velocity (time)
 	bool fire;//check ready to engage status (every 5 sec)
-	int count;
+	int count;//number of points to reach
 };
 
 
 //animate enemy unit function
-void enemyMovement(vector<enemy>&, double, COORD);
+void enemyMovement(vector<enemy>&, double, COORD, int, double);
 void printEnemy(COORD);
-void enemyUnitAi(double, enemy&);
+void enemyUnitAi(double, enemy&, double);
 void targetPoint(vector<enemy>&);//set the target points
 //check if enemy is true
-double isEnemyAlive(double, vector<enemy>&);
+double isEnemyAlive(double, vector<enemy>&, int);
 
 #endif
