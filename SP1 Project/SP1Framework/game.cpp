@@ -13,15 +13,17 @@
 
 double elapsedTime;
 double deltaTime;
-double velocity = 0.2;
+double velocity = 0.4;
 bool keyPressed[K_COUNT];
 COORD charLocation;
 COORD consoleSize;
 COORD playerDirection;
 int ammoSize;
 int enemySize = 8;
+int points;
 vector<enemy> unit(enemySize);
-vector<projectile> bullet(ammoSize);
+vector<projectile> bullet;
+projectile AddBullet;
 
 void init()
 {
@@ -48,7 +50,7 @@ void init()
 
     elapsedTime = 0.0;
 
-	
+	points = 20;
 	//enemy size
 	//enemySize = 8;
 	//initialize enemy unit spawn points first time round (total of 7 enemy units), read from text file
@@ -56,11 +58,12 @@ void init()
 	for(int i=0; i<enemySize; ++i)
 	{
 		unit[i].active = false;
-		unit[i].spawnLocation.Y = 1;//each unit Y is 0
+		unit[i].spawnLocation.Y = -1;//each unit Y is -1 to hide it from the top of the map when at spawn waiting to be deployed
 		unit[i].location.Y = unit[i].spawnLocation.Y;
 		unit[i].mobile = true;
 		
-		for(int j=0; j<10; ++j)
+		//set 15 target points for each unit
+		for(int j=0; j<points; ++j)
 		{
 			unit[i].point.push_back(charLocation);//push in char location to populate vector first
 		}
@@ -83,10 +86,9 @@ void init()
 	}
 
 	//preset target location
-	targetPoint(unit);
+	targetPoint(unit, points);
 
 	//set number of ammo per shot
-	ammoSize = 2;
 	/**
 	//initialize the timer for buffs
 	powerupBullet.timer = 0.0;
@@ -177,7 +179,55 @@ void update(double dt)
 
 
 	//updates enemy movement, parameter is enemy unit, double elapsedTime, COORD consoleSize
-	enemyMovement(unit, elapsedTime, consoleSize, enemySize, velocity);
+	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, velocity);
+
+	 //for (int a = 0;a < 3; a++)
+        //{
+       
+        //}
+ 
+        /*weapon1 Default;
+        Default.damage = 1;
+        Default.BC.X = charLocation.X;
+        Default.BC.Y = charLocation.Y - 1;
+ 
+        for(int b = 0; b < 3; b++)
+        {
+                bullet.push_back(projectile());
+        }
+        for (int a = 0; a < 3; a++)
+        {
+                if (GetAsyncKeyState != 0)
+                {
+                        bullet[a].pressing = true;
+                        //bullet[a].bulletCoordinate.X = charLocation.X;
+                }
+        }
+ 
+        bullet[0].bulletCoordinate.Y = charLocation.Y - 1;
+		bullet[0].bulletCoordinate.X = charLocation.X;
+        bullet[1].bulletCoordinate.Y = charLocation.Y - 1;
+		bullet[1].bulletCoordinate.X = charLocation.X;
+        bullet[2].bulletCoordinate.Y = charLocation.Y - 1;
+		bullet[2].bulletCoordinate.X = charLocation.X;*/
+        //Update bullet movement
+        //bulletmovement(bullet , consoleSize);
+
+		//bulletmovement(bullet, consoleSize);
+
+		//Bullets By Quen
+		if (keyPressed[K_SPACE])//Player Presses Space
+		{
+		//Bullets Will Be Generated and Added in the Vector(GENERATED, NOT SPAWNED) STEP 1
+			AddBullet.xCoordinate = charLocation.X;
+			AddBullet.yCoordinate = charLocation.Y - 1;
+			AddBullet.pressing = true;
+			bullet.push_back(AddBullet);
+		}
+		/*//MAKE THE BULLETS THAT ARE GENERATED MOVE      STEP 2
+		*/
+
+		void movebullet();
 
 	//health();
 
@@ -205,6 +255,7 @@ void render()
 	colour(0xffffff00);
 	std::cout << "Score: " << score() << " ";
 
+	
 	//player character
 	gotoXY(charLocation);
     colour(0x0C);
@@ -246,7 +297,7 @@ void render()
     //render the game
 	for(int i=0; i<enemySize; ++i)
 	{//psss in the X and Y coor. of each unit
-		if(unit[i].active == true)
+		if(unit[i].active == true && unit[i].location.Y != -1)//do not display waiting characters
 		{
 			printEnemy(unit[i].location);
 		}
