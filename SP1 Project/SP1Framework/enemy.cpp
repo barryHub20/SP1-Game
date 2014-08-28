@@ -13,13 +13,10 @@
 #include <float.h>
 using std::vector;
 extern COORD consoleSize;
-extern vector<enemy> unit;
-
 
 //enemy passed in by reference so that updated X and Y coor. is updated to unit.X[i] and unit.Y[i]
-void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, int size, int points, double velocity)
+void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, int size, int points, double velocity, double frameTime)
 {
-	//pattern for waves, spawn 4 followed by 3 ...
 	 //check if enemy is still alive and pass in spawn time to check if the unit's wave period has expired, also pass in unit to edit its active status
 	//waves starts when spawnTime is 4
 	
@@ -32,7 +29,7 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 		{
 			if(unit[i].active == true)//if the unit is active
 			{
-				enemyUnitAi(elapsedTime, unit[i], velocity, points);//calls enemyAi and update its direction(pass as pointer)
+				enemyUnitAi(elapsedTime, unit[i], velocity, points, frameTime);//calls enemyAi and update its direction(pass as pointer)
 			}
 		}
 	}
@@ -43,24 +40,30 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 		{
 			if(unit[i].active == true)//if the unit is active
 			{
-				enemyUnitAi(elapsedTime, unit[i], velocity, points);//calls enemyAi and update its direction(pass as pointer)	
+				enemyUnitAi(elapsedTime, unit[i], velocity, points, frameTime);//calls enemyAi and update its direction(pass as pointer)	
 			}
 		}
 	}
 
 }
 
-void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfPoints)
+void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfPoints, double frameTime)
 {
-	/** if not reach the 10th preset point yet **/
-	/** if not reach the 10th preset point yet /**/
-
+	/**
 	if(unit.location.Y != unit.point[unit.count].Y && elapsedTime >= unit.time)
  	{
  		unit.time = elapsedTime + velocity;
  		unit.location.Y++;
- 	}
+ 	}/**/
+	if(unit.time < velocity)
+	{
+		unit.time += frameTime;//frameTime is deltaTime, counts time for each frame so is accurate with FPS
+	}
 
+	if(unit.location.Y != unit.point[unit.count].Y && unit.time >= velocity)
+	{
+		unit.location.Y++;
+	}
 
 	//if reached the X coor but not the Y coor of the target point and not the player line
 	//if not reach the X coor of the target point and not reach player line
@@ -87,6 +90,17 @@ void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfP
 			++unit.count;//increment the counter to refer to another preset target point
 		}
 	}
+
+	//reset unit.time back to 0 or remainder
+	if(unit.time == velocity)
+	{
+		unit.time = 0;
+	}
+	else if(unit.time > velocity)
+	{
+		unit.time -= velocity;
+	}
+
 }
 
 double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int points)
@@ -104,15 +118,11 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int point
 
 	static double respawn = 2;//set to 4 first
 	
-	bool reset = false;//if true, reset all x and y of units (all units died)
+	bool reset = true;//if true, reset all x and y of units (all units died)
 
 	for(int i=0; i<size; ++i)
 	{
-		if(unit[i].active == false)//if unit is false
-		{
-			reset = true;
-		}
-		else if(unit[i].active == true)//else if unit is true
+		if(unit[i].active == true)//if a unit is true
 		{
 			reset = false;
 			break;//break since still got one unit alive

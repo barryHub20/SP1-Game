@@ -13,7 +13,7 @@
 
 double elapsedTime;
 double deltaTime;
-double velocity = 0.4;
+double velocity = 0.5;
 bool keyPressed[K_COUNT];
 COORD charLocation;
 COORD consoleSize;
@@ -61,6 +61,7 @@ void init()
 		unit[i].spawnLocation.Y = -1;//each unit Y is -1 to hide it from the top of the map when at spawn waiting to be deployed
 		unit[i].location.Y = unit[i].spawnLocation.Y;
 		unit[i].mobile = true;
+		unit[i].time = 0;
 		
 		//set 15 target points for each unit
 		for(int j=0; j<points; ++j)
@@ -179,7 +180,7 @@ void update(double dt)
 
 
 	//updates enemy movement, parameter is enemy unit, double elapsedTime, COORD consoleSize
-	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, velocity);
+	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, velocity, deltaTime);
 
 	 //for (int a = 0;a < 3; a++)
         //{

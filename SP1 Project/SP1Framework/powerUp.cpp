@@ -8,9 +8,9 @@ void powerup()
 
 	if (powerupBullet.timer > 20)
 	{
-		powerupBullet.placeForBuffs.X = rand() % 100;	//spawns the icon at a random x coordinate
+		powerupBullet.placeForBuffs.X = rand() % 80;	//spawns the icon at a random x coordinate
 		powerupBullet.placeForBuffs.Y = 0;			    //spawns icon at top of screen
-		powerupBullet.timer =0;
+		powerupBullet.timer = 0;
 	}
 
 	if (powerupBullet.timer++)
