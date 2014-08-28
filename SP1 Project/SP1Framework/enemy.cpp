@@ -14,6 +14,7 @@
 using std::vector;
 extern COORD consoleSize;
 extern vector<enemy> unit;
+int gridX = consoleSize.X / 8;//the length of each grid
 
 
 //enemy passed in by reference so that updated X and Y coor. is updated to unit.X[i] and unit.Y[i]
@@ -29,7 +30,7 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 		//wave 1
 		if(elapsedTime >=spawnTime)
 		{
-			for(int i=0; i<size / 2; ++i)
+			for(int i=0; i<size; ++i)
 			{
 				if(unit[i].active == true)//if the unit is active
 				{
@@ -40,7 +41,7 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 		//wave 2
 		if(elapsedTime >= spawnTime + 4)
 		{
-			for(int i=size / 2; i<size; ++i)
+			for(int i=size / 2; i<size / 2; ++i)
 			{
 				if(unit[i].active == true)//if the unit is active
 				{
@@ -53,20 +54,20 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 
 void enemyUnitAi(double elapsedTime, enemy& unit, double velocity)
 {
-	/** if not reach the 10th preset point yet **/
+	/** if not reach the 10th preset point yet 
 	if(unit.mobile == false)
 	{
 		if(elapsedTime >= unit.time)
 		{
 			unit.mobile = true;
 		}
-	}
+	}/**/
 
-	if(unit.location.Y != unit.point[unit.count].Y && unit.count < 10 && unit.mobile == true)
+	if(unit.location.Y != unit.point[unit.count].Y && unit.count < 10 && elapsedTime >= unit.time)
 	{
 		unit.time = elapsedTime + velocity;
 		unit.location.Y++;
-		unit.mobile = false;
+		//unit.mobile = false;
 	}
 
 	//if reached the X coor but not the Y coor of the target point and not the player line
@@ -87,7 +88,6 @@ void enemyUnitAi(double elapsedTime, enemy& unit, double velocity)
 		//if reached target point, call to set new target point and not reach player line
 	if(unit.location.X == unit.point[unit.count].X  && unit.location.Y == unit.point[unit.count].Y && unit.count < 10)
 	{
-		unit.mobile = false;//if false, can fire bullets
 		//unit.stop_Timer = time + (rand() % 3 + 1);//can stop from 1 to 3 seconds;
 		unit.count++;//increment the counter to refer to another preset target point
 	}
@@ -150,17 +150,16 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit, int size)
 
 void targetPoint(vector<enemy>& unit)
 {
-	int gridX = consoleSize.X / 8;//the length of each grid
 	//loop through all units, 8 units
 	for(int i=0; i<8; ++i)
 	{
-		int X = unit[i].spawnLocation.X + gridX / 2;//X is the rightmost point of the grid of the respective enemy unit
-		unit[i].point[0].X = rand() % 9 + (X - 10);//does not need
+		//int X = (unit[i].spawnLocation.X + gridX / 2);//X is the rightmost point of the grid of the respective enemy unit
+		unit[i].point[0].X = rand() % 9 + ((unit[i].spawnLocation.X + gridX / 2) - 9);//does not need
 		unit[i].point[0].Y = rand() % 5 + 1;//everytime set new target point, enemy unit will move 5 pixels towards player
 		//store the target point for each enemy unit
 		for(int j = 1; j<10; ++j)//modify to set 7 preset points
 		{
-			unit[i].point[j].X = rand() % 9 + (X - 10);//does not need
+			unit[i].point[j].X = rand() % 9 + ((unit[i].spawnLocation.X + gridX / 2) - 9);//does not need
 			unit[i].point[j].Y = (unit[i].point[j - 1]).Y + 5;//everytime set new target point, enemy unit will move 5 pixels towards player
 		}
 	}
