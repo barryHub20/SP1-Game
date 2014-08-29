@@ -92,6 +92,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="mainmenu.h" />
     <ClInclude Include="powerUp.h" />
+    <ClInclude Include="wall.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

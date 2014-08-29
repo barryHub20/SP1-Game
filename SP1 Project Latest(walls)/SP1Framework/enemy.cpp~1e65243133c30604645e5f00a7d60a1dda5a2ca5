@@ -12,7 +12,6 @@
 #include <vector>
 #include <float.h>
 using std::vector;
-extern COORD consoleSize;
 
 //enemy passed in by reference so that updated X and Y coor. is updated to unit.X[i] and unit.Y[i]
 void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, int size, int points, double velocity, double frameTime)
@@ -21,13 +20,13 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 	//waves starts when spawnTime is 4
 	
 		
-	double spawnTime = isEnemyAlive(elapsedTime, unit, size, points);//get the new spawn time
+	double spawnTime = isEnemyAlive(elapsedTime, unit, size, points, consoleSize);//get the new spawn time
 	//wave 1
 	if(elapsedTime >=spawnTime)
 	{
 		for(int i=0; i<size/2; ++i)
 		{
-			if(unit[i].active == true)//if the unit is active
+			if(unit[i].active == true && unit[i].mobile == true)//if the unit is active
 			{
 				enemyUnitAi(elapsedTime, unit[i], velocity, points, frameTime);//calls enemyAi and update its direction(pass as pointer)
 			}
@@ -38,7 +37,7 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 	{
 		for(int i=size / 2; i<size; ++i)
 		{
-			if(unit[i].active == true)//if the unit is active
+			if(unit[i].active == true && unit[i].mobile == true)//if the unit is active
 			{
 				enemyUnitAi(elapsedTime, unit[i], velocity, points, frameTime);//calls enemyAi and update its direction(pass as pointer)	
 			}
@@ -67,7 +66,7 @@ void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfP
 
 	//if reached the X coor but not the Y coor of the target point and not the player line
 	//if not reach the X coor of the target point and not reach player line
-	if(unit.location.X != unit.point[unit.count].X && unit.location.Y == unit.point[unit.count].Y)
+	if(unit.location.X != unit.point[unit.count].X && unit.location.Y == unit.point[unit.count].Y && unit.time >= velocity)
 	{
 		//if the target point X coor is bigger than the spawn point X coor
 		if(unit.location.X < unit.point[unit.count].X)
@@ -96,17 +95,25 @@ void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfP
 	{
 		unit.time = 0;
 	}
-	else if(unit.time > velocity)
+	else if(unit.time > velocity)//if the unit.time is longer than velocity
 	{
 		unit.time -= velocity;
 	}
-
 }
 
-double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int points)
+double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int points, COORD consoleSize)
 {
 	//simulate if all enemy unit died when reach Y = 30 (add score function to count score)
 	//for enemy to die, make sure THAT UNIT.ACTIVE IS TRUE, even if false, units are initialiszed in their respective spawn points and if bullets hit it, scores
+	
+	for(int i=0; i<size; ++i)
+	{
+		if(unit[i].location.Y >= 25)
+		{
+			unit[i].mobile = false;
+		}
+	}
+	
 	for(int i=0; i<size; ++i)
 	{
 		if(unit[i].location.Y >= 30)
@@ -148,14 +155,14 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int point
 		{
 			unit[i].count = 0;//set counter to 0
 		}
-		targetPoint(unit, points);
+		targetPoint(unit, points, consoleSize);
 		respawn = currentTime + 2;//respawn time reset for further references
 	}
 
 	return respawn;//return start spawn time
 }
 
-void targetPoint(vector<enemy>& unit, int points)
+void targetPoint(vector<enemy>& unit, int points, COORD consoleSize)
 {
 	int gridX = consoleSize.X / 8;//the length of each grid
 	//loop through all units, 8 units
@@ -187,3 +194,4 @@ void printEnemy(COORD body)
 	gotoXY(body.X + 1, body.Y);
 	std::cout << (char)180;
 }
+

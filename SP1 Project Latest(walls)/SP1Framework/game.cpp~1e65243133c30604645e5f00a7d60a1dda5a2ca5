@@ -10,6 +10,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdlib.h>
+#include "wall.h"
 
 double elapsedTime;
 double deltaTime;
@@ -22,8 +23,15 @@ int ammoSize;
 int enemySize = 8;
 int points;
 vector<enemy> unit(enemySize);
+double gapPlayer;
+double playerbullet;
+double EnemyBullet;
+double EnemyGap;
 vector<projectile> bullet;
 projectile AddBullet;
+
+vector<laser> EB; //Enemy Bullet
+laser AddEnemyBullet; //Add Enemy Bullet
 
 void init()
 {
@@ -46,13 +54,13 @@ void init()
 
     // set the character to be in the center of the screen.
     charLocation.X = consoleSize.X / 2;
-    charLocation.Y = consoleSize.Y / 2;
+    charLocation.Y = consoleSize.Y - 1;
 
     elapsedTime = 0.0;
 
 	points = 20;
 	//enemy size
-	//enemySize = 8;
+	enemySize = 8;
 	//initialize enemy unit spawn points first time round (total of 7 enemy units), read from text file
 	//set all enemy units to true first time round
 	for(int i=0; i<enemySize; ++i)
@@ -87,7 +95,7 @@ void init()
 	}
 
 	//preset target location
-	targetPoint(unit, points);
+	targetPoint(unit, points, consoleSize);
 
 	//set number of ammo per shot
 	/**
@@ -124,25 +132,22 @@ void update(double dt)
    // get the delta time
     elapsedTime += dt;
     deltaTime = dt;
+	gapPlayer += dt;
+	playerbullet += dt;
+	EnemyBullet += dt;
+	EnemyGap += dt;
 
     // Updating the location of the character based on the key press
-    if (keyPressed[K_UP] && charLocation.Y > 0)
+  if (keyPressed[K_LEFT] && charLocation.X > 1)
     {
-        charLocation.Y-=1; 
-    }
-    if (keyPressed[K_LEFT] && charLocation.X > 1)
-    {
-        charLocation.X-=3; 
-    }
-    if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1)
-    {
-       charLocation.Y+=1; 
-    }
-    if (keyPressed[K_RIGHT] && charLocation.X < consoleSize.X - 4)
-    {
-        charLocation.X+=3; 
+        charLocation.X-=3;
     }
 
+    if (keyPressed[K_RIGHT] && charLocation.X < consoleSize.X - 4)
+    {
+        charLocation.X+=3;
+    }
+ 
 	//player direction
     if (keyPressed[K_LEFT] && playerDirection.X >= 0)
     {
@@ -161,75 +166,82 @@ void update(double dt)
     }
     // quits the game if player hits the escape key
     if (keyPressed[K_ESCAPE])
-        g_quitGame = true;    
-	/**
-	//updates bullets
-	if (keyPressed[K_SPACE])
-    {
-		static int a = 0;//counter to store the ammo amount and access individual bullet elements
-		if(a != ammoSize)
+        g_quitGame = true; 
+
+	if((int)elapsedTime % 999 == 0)
+	{
+	for(int a = 0; a < MAXWALL; a++) //load the walls FIRST
 		{
-			bulletMovement(bullet[a]);
-			a++;
+
+			thewall[a].loadwall();	
+
 		}
-		else
+		for(int a = 0; a < MAXWALL; a++)// check the wall coordinates
 		{
-			
+			for(int b = 0; b < MAXWALL; b++)
+			{
+				if(a != b)
+				{
+					if((thewall[a].x - thewall[b].x < 5) && (thewall[a].x - thewall[b].x > -5) )//if they are overlapping
+					{
+						thewall[b].loadwall();//re-random
+						a =0;
+						b =0;
+					}
+				}
+			}
 		}
-    }/**/
+	}
+	
+	if (keyPressed[K_SPACE])//Player Presses Space
+	{
+		if (gapPlayer >= 1.2) //Prevent "charging" of bullent
+		{
+			gapPlayer = 0.3;
+		}
+
+		if (gapPlayer > 0.6)//Limit when player can press spacebar
+		{
+			AddBullet.xCoordinate = charLocation.X;
+			AddBullet.yCoordinate = charLocation.Y;
+			AddBullet.pressing = true;
+			bullet.push_back(AddBullet);
+			gapPlayer -= 0.6;
+		}
+	}
 
 
 	//updates enemy movement, parameter is enemy unit, double elapsedTime, COORD consoleSize
 	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, velocity, deltaTime);
 
-	 //for (int a = 0;a < 3; a++)
-        //{
-       
-        //}
- 
-        /*weapon1 Default;
-        Default.damage = 1;
-        Default.BC.X = charLocation.X;
-        Default.BC.Y = charLocation.Y - 1;
- 
-        for(int b = 0; b < 3; b++)
-        {
-                bullet.push_back(projectile());
-        }
-        for (int a = 0; a < 3; a++)
-        {
-                if (GetAsyncKeyState != 0)
-                {
-                        bullet[a].pressing = true;
-                        //bullet[a].bulletCoordinate.X = charLocation.X;
-                }
-        }
- 
-        bullet[0].bulletCoordinate.Y = charLocation.Y - 1;
-		bullet[0].bulletCoordinate.X = charLocation.X;
-        bullet[1].bulletCoordinate.Y = charLocation.Y - 1;
-		bullet[1].bulletCoordinate.X = charLocation.X;
-        bullet[2].bulletCoordinate.Y = charLocation.Y - 1;
-		bullet[2].bulletCoordinate.X = charLocation.X;*/
-        //Update bullet movement
-        //bulletmovement(bullet , consoleSize);
 
-		//bulletmovement(bullet, consoleSize);
-
-		//Bullets By Quen
-		if (keyPressed[K_SPACE])//Player Presses Space
+	if (EnemyBullet > 7.5)
+	{
+		for (int o = 0; o < enemySize; o++)
 		{
-		//Bullets Will Be Generated and Added in the Vector(GENERATED, NOT SPAWNED) STEP 1
-			AddBullet.xCoordinate = charLocation.X;
-			AddBullet.yCoordinate = charLocation.Y - 1;
-			AddBullet.pressing = true;
-			bullet.push_back(AddBullet);
+			AddEnemyBullet.XC = unit[o].location.X;
+			AddEnemyBullet.YC = unit[o].location.Y + 1;
+			AddEnemyBullet.shooting = true;
+			EB.push_back(AddEnemyBullet);
+			EnemyBullet -= 6.5;
 		}
-		/*//MAKE THE BULLETS THAT ARE GENERATED MOVE      STEP 2
-		*/
-
-		void movebullet();
-
+	}
+	
+	if (EnemyGap >= 1.5)
+	{
+		MoveEnemyBullet(EB);
+		EnemyGap -= 1.5;
+	}
+		
+		if (playerbullet >= 1) //Limit Bullet speed
+	{
+		moveBullet(bullet, unit);
+		playerbullet -= 1;
+	}
+		
+		
+		
+		collision(bullet, unit);
 	//health();
 
 	//powerup();
@@ -256,6 +268,11 @@ void render()
 	colour(0xffffff00);
 	std::cout << "Score: " << score() << " ";
 
+	for (int i = 0; i < MAXWALL; i++)
+	{
+		thewall[i].renderwall();
+	}
+
 	
 	//player character
 	gotoXY(charLocation);
@@ -271,39 +288,36 @@ void render()
     colour(0x0C);
 	std::cout << player.body;
 
-	if (GetAsyncKeyState(VK_UP) != 0)
-	{
-		std::cout << player.front;
-	}
-	else if (GetAsyncKeyState(VK_DOWN) != 0)
-	{
-		gotoXY(playerDirection);
-		std::cout << player.back;
-	}
-	else if (GetAsyncKeyState(VK_LEFT) != 0)
+	if (GetAsyncKeyState(VK_LEFT) != 0)
 	{
 		gotoXY(playerDirection);
 		std::cout << player.left;
 	}
-	else if (GetAsyncKeyState(VK_RIGHT) != 0)
-	{
-		gotoXY(playerDirection);
-		std::cout << player.right;
-	}
-	else if (GetAsyncKeyState(VK_UP) == 0)//by default face up
-	{
-		std::cout << player.front;
-	}
+        else if (GetAsyncKeyState(VK_RIGHT) != 0)
+        {
+                gotoXY(playerDirection);
+                std::cout << player.right;
+        }
+        else if (GetAsyncKeyState(VK_UP) == 0 || GetAsyncKeyState(VK_UP) != 0)//by default face up
+        {
+                std::cout << player.front;
+        }
 
+	
     //render the game
 	for(int i=0; i<enemySize; ++i)
-	{//psss in the X and Y coor. of each unit
+	{
+		//psss in the X and Y coor. of each unit
 		if(unit[i].active == true && unit[i].location.Y != -1)//do not display waiting characters
 		{
 			printEnemy(unit[i].location);
 		}
 	}	
 
+	showBullet(bullet);
+
+	ShowEnemyBullet(EB);
+	EnemyBulletCollision(EB);
 	//printPowerUp();
 
 	//printHealth();

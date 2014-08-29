@@ -6,24 +6,20 @@
 //struct for buffs
 struct buffsForPlayer
 {
+	bool active;
 	double timer;
 	COORD placeForBuffs;
 };
 
 namespace
 {
-	buffsForPlayer healthPack;
 	buffsForPlayer powerupBullet;
 }
 
-//power up function
-void powerup();
+//moving of the buffs
+void powerupMovement();
 
-//health function
-void health();
-
-//print 
-void printPowerUp();
-void printHealth();
+//printing of powerup
+void powerupPrint();
 
 #endif

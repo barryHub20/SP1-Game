@@ -2,6 +2,7 @@
 #define _ENEMY_H
 
 #include "Framework\timer.h"
+#include "playerZone.h"
 #include <vector>
 using std::vector;
 
@@ -20,13 +21,13 @@ struct enemy
 	bool alive;
 };
 
-
-
 //animate enemy unit function
-void enemyMovement(vector<enemy>&, double, COORD, int, int, double, double);
+void enemyMovement(vector<enemy>&, double, COORD, int, int, int, double, double);
 void printEnemy(COORD);
 void enemyUnitAi(double, enemy&, double, int, double);
 void targetPoint(vector<enemy>&, int, COORD);//set the target points
 //check if enemy is true
-double isEnemyAlive(double, vector<enemy>&, int, int, COORD);
+double isEnemyAlive(double, vector<enemy>&, int, int, int&, COORD, double&, double);
+void ifTouched(double, zone&, vector<enemy>);//counts down if an enemy unit reaches it
+
 #endif

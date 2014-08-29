@@ -4,12 +4,14 @@
 #include "powerUp.h"
 #include "game.h"
 #include "bullet.h"
+#include "playerZone.h"
 #include "Framework\console.h"
 #include "enemy.h"
 #include "mainmenu.h"
 #include <iostream>
 #include <iomanip>
 #include <stdlib.h>
+#include "mainmenu.h"
 #include "wall.h"
 
 double elapsedTime;
@@ -22,6 +24,7 @@ COORD playerDirection;
 int ammoSize;
 int enemySize = 8;
 int points;
+int waveCounter;
 vector<enemy> unit(enemySize);
 double gapPlayer;
 double playerbullet;
@@ -29,9 +32,9 @@ double EnemyBullet;
 double EnemyGap;
 vector<projectile> bullet;
 projectile AddBullet;
-
 vector<laser> EB; //Enemy Bullet
 laser AddEnemyBullet; //Add Enemy Bullet
+zone playerZone;
 
 void init()
 {
@@ -59,8 +62,9 @@ void init()
     elapsedTime = 0.0;
 
 	points = 20;
-	//enemy size
 	enemySize = 8;
+	playerZone.Y = 30;
+	waveCounter = 0;
 	//initialize enemy unit spawn points first time round (total of 7 enemy units), read from text file
 	//set all enemy units to true first time round
 	for(int i=0; i<enemySize; ++i)
@@ -127,8 +131,7 @@ void update(double dt)
 
 	// timer for buffs
 	powerupBullet.timer += dt;
-	healthPack.timer += dt;
-
+	
    // get the delta time
     elapsedTime += dt;
     deltaTime = dt;
@@ -212,8 +215,10 @@ void update(double dt)
 
 
 	//updates enemy movement, parameter is enemy unit, double elapsedTime, COORD consoleSize
-	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, velocity, deltaTime);
+	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, waveCounter, velocity, deltaTime);
 
+	//checks if touched player zone
+	ifTouched(deltaTime, playerZone, unit);
 
 	if (EnemyBullet > 7.5)
 	{

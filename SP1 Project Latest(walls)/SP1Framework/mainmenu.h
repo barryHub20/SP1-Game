@@ -1,3 +1,4 @@
+
 #ifndef _MAINMENU_H
 #define _MAINMENU_H
 
@@ -9,6 +10,6 @@
 using std::string;
 
 void MainMenu();
-void HighScore();
+void loseScreen();
 
 #endif

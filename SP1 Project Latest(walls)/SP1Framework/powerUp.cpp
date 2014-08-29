@@ -1,49 +1,45 @@
 #include "Framework\console.h"
 #include "powerUp.h"
 #include "game.h"
-#include <iostream>
+#include "mainmenu.h"
+#include <iostream>	
 
-void powerup()
+void powerupMovement()
 {
-
-	if (powerupBullet.timer > 20)
+	if (powerupBullet.active = true)
 	{
-		powerupBullet.placeForBuffs.X = rand() % 80;	//spawns the icon at a random x coordinate
-		powerupBullet.placeForBuffs.Y = 0;			    //spawns icon at top of screen
-		powerupBullet.timer = 0;
+		powerupBullet.placeForBuffs.X++;
+		powerupBullet.placeForBuffs.Y = 10;
 	}
 
-	if (powerupBullet.timer++)
+	if (powerupBullet.placeForBuffs.X > 45)
 	{
-		powerupBullet.placeForBuffs.Y--;
-	}
-}
-
-void health()
-{
-
-	if (healthPack.timer > 50)
-	{
-		healthPack.placeForBuffs.X = rand() % 100;
-		healthPack.placeForBuffs.Y = 0;
-		healthPack.timer = 0;
+		powerupBullet.active = false;
 	}
 
-	if (healthPack.timer++)
-	{
-		healthPack.placeForBuffs.Y--;
-	}
+	//if (playerbullet coordinates == powerupBullet.placeForBuffs)
+	//{
+	//	powerupBullet.active = false;
+	//	if (NoOfBulletsShoot < 4)
+	//	{
+	//		NoOfBulletsShoot++;
+	//	}
+	//}
 
 }
 
-void printPowerUp ()
+void powerupPrint()
 {
-	gotoXY(powerupBullet.placeForBuffs);
-	std::cout << "P";
+	if (powerupBullet.active == true)
+	{
+		gotoXY(powerupBullet.placeForBuffs.X, powerupBullet.placeForBuffs.Y);
+		std::cout << "P";
+	}
+
+	if (powerupBullet.active == false)
+	{
+		gotoXY(powerupBullet.placeForBuffs.X, powerupBullet.placeForBuffs.Y);
+		std::cout << " ";
+	}
 }
 
-void printHealth()
-{
-	gotoXY(healthPack.placeForBuffs);
-	std::cout << (char)3;
-}

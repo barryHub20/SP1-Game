@@ -11,14 +11,15 @@
 #include <stdlib.h>
 #define MAXWALL 3
 using std::string;
+
 struct walls{ 
 	int x;
 	int y;
 	
 	void loadwall() 
 	{
-		x = rand()%77; //77
-		y = rand()%10+1; //10
+		x = rand()%50+10; //77
+		y = rand()%9+1; //10
 	}
 
 	void renderwall()

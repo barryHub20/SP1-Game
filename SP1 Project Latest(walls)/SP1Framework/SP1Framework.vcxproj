@@ -82,6 +82,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainmenu.cpp" />
+    <ClCompile Include="playerZone.cpp" />
     <ClCompile Include="powerUp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,7 @@
     <ClInclude Include="Framework\timer.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="mainmenu.h" />
+    <ClInclude Include="playerZone.h" />
     <ClInclude Include="powerUp.h" />
     <ClInclude Include="wall.h" />
   </ItemGroup>

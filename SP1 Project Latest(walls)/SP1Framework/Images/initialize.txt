@@ -1,0 +1,57 @@
+points = 20;
+	enemySize = 8;
+	velocity = 0.4;
+	waveCounter = 0;
+	playerZone.breech = 5;//breech in 5 seconds
+	playerZone.timer = 0;//timer for player zone to countdwon if 1 enemy is attacking it
+
+	//initialize enemy unit spawn points first time round (total of 7 enemy units), read from text file
+	//set all enemy units to true first time round
+	for(int i=0; i<enemySize; ++i)
+	{
+		unit[i].active = false;
+		unit[i].spawnLocation.Y = -1;//each unit Y is -1 to hide it from the top of the map when at spawn waiting to be deployed
+		unit[i].location.Y = unit[i].spawnLocation.Y;
+		unit[i].mobile = true;
+		unit[i].time = 0;
+
+		//set 15 target points for each unit
+		for(int j=0; j<points; ++j)
+		{
+			unit[i].point.push_back(charLocation);//push in char location to populate vector first
+		}
+	}
+
+	//set the spawn location for now
+	unit[0].spawnLocation.X = 5;
+	unit[1].spawnLocation.X = 25;
+	unit[2].spawnLocation.X = 45;
+	unit[3].spawnLocation.X = 65;
+	unit[4].spawnLocation.X = 15;
+	unit[5].spawnLocation.X = 35;
+	unit[6].spawnLocation.X = 55;
+	unit[7].spawnLocation.X = 75;
+
+	for(int i=0; i<enemySize; ++i)
+	{
+		unit[i].location.X = unit[i].spawnLocation.X;
+		unit[i].count = 0;//set counter to 0
+	}
+
+	//preset target location
+	targetPoint(unit, points, consoleSize);
+
+	//set number of ammo per shot
+	/**
+	//initialize the timer for buffs
+	powerupBullet.timer = 0.0;
+	healthPack.timer = 0.0;
+	**/
+
+	/** set the player zone **/
+	playerZone.Y = 25;//Y coor is stored at 25;
+
+	powerupBullet.timer = 0.0;
+	powerupBullet.placeForBuffs.X = 0;
+	powerupBullet.placeForBuffs.Y = 10;
+	powerupBullet.active = true;

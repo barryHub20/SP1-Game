@@ -5,8 +5,8 @@
 
 void MainMenu()
 {
-	 
-	string Menu[4] = {"                                                 PLAY", "                                              HIGHSCORES", "                                               CONTROLS", "                                                 EXIT"}; // Variables in the Menu
+
+	string Menu[4] = {"                                       PLAY", "                                    HIGHSCORES", "                                   INSTRUCTIONS", "                                       EXIT"}; // Variables in the Menu
 	int pointer = 0;
 	std::ifstream inData;
 	string data;
@@ -82,7 +82,7 @@ void MainMenu()
 							std::cout << data << std::endl;
 
 						}
-						// add a pause
+						system("pause");
 						inData.close();	
 						break;
 					} 
@@ -97,7 +97,7 @@ void MainMenu()
 							std::cout << data << std::endl;
 
 						}
-						// add a pause
+						system("pause");
 						inData.close();
 						break;
 					}
@@ -112,4 +112,26 @@ void MainMenu()
 		}
 		Sleep(150);
 	}
+}
+
+void loseScreen()
+{
+	cls();
+	std::ifstream inData;
+	std::string data;
+
+	inData.open ("Images/losescreen.txt"); 
+	while (!inData.eof())
+	{
+		getline (inData, data);
+		std::cout << data << std::endl;
+	}
+	inData.close();
+
+	if (GetAsyncKeyState(VK_RETURN))
+	{
+		MainMenu();
+	}
+
+	Sleep(300);
 }

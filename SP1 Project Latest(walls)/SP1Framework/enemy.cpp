@@ -4,6 +4,8 @@
 #include "game.h"
 #include "enemy.h"
 #include "bullet.h"
+#include "mainmenu.h"
+#include "playerZone.h"
 #include "Framework\console.h"
 #include <dos.h>
 #include <stdlib.h>
@@ -14,13 +16,13 @@
 using std::vector;
 
 //enemy passed in by reference so that updated X and Y coor. is updated to unit.X[i] and unit.Y[i]
-void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, int size, int points, double velocity, double frameTime)
+void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, int size, int points, int waveCounter, double velocity, double frameTime)
 {
 	 //check if enemy is still alive and pass in spawn time to check if the unit's wave period has expired, also pass in unit to edit its active status
 	//waves starts when spawnTime is 4
 	
 		
-	double spawnTime = isEnemyAlive(elapsedTime, unit, size, points, consoleSize);//get the new spawn time
+	double spawnTime = isEnemyAlive(elapsedTime, unit, size, points, waveCounter, consoleSize, velocity, frameTime);//get the new spawn time
 	//wave 1
 	if(elapsedTime >=spawnTime)
 	{
@@ -101,17 +103,22 @@ void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfP
 	}
 }
 
-double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int points, COORD consoleSize)
+double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int points, int& waveCounter, COORD consoleSize, double& velocity, double deltaTime)
 {
-	//simulate if all enemy unit died when reach Y = 30 (add score function to count score)
-	//for enemy to die, make sure THAT UNIT.ACTIVE IS TRUE, even if false, units are initialiszed in their respective spawn points and if bullets hit it, scores
 	
-	for(int i=0; i<size; ++i)
+	if(waveCounter == 2)
 	{
-		if(unit[i].location.Y >= 25)
-		{
-			unit[i].mobile = false;
-		}
+		velocity = 0.3;
+	}
+
+	if(waveCounter == 3)
+	{
+		velocity = 0.2;
+	}
+
+	if(waveCounter == 4)
+	{
+		velocity = 0.1;
 	}
 	
 	for(int i=0; i<size; ++i)
@@ -155,8 +162,11 @@ double isEnemyAlive(double currentTime, vector<enemy>& unit, int size, int point
 		{
 			unit[i].count = 0;//set counter to 0
 		}
+
+		waveCounter++;//increments number of wave cleared
 		targetPoint(unit, points, consoleSize);
 		respawn = currentTime + 2;//respawn time reset for further references
+
 	}
 
 	return respawn;//return start spawn time

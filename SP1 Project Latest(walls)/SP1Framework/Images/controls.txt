@@ -1,5 +1,13 @@
-                                       LEFT  : LEFT ARROW KEY
-                                       RIGHT : RIGHT ARROW KEY
-                                       SHOOT : SPACEBAR
-                                       PAUSE : P
-                                       SELECT: ENTER
+	      Steer your character around and avoid the enemy while killing them, 
+              preventing them from entering your zone.
+ 
+				   POWER-UPS: P					 
+				   HEALTH   : Heart shaped symbols
+
+		                   CONTROLS
+                                   LEFT  : LEFT ARROW KEY
+                                   RIGHT : RIGHT ARROW KEY
+                                   SHOOT : SPACEBAR
+                                   PAUSE : P
+                                   SELECT: ENTER
+			           ESC   : RETURN TO MAIN MENU WHEN IN GAME
