@@ -241,10 +241,8 @@ void update(double dt)
 		if (playerbullet >= 1) //Limit Bullet speed
 	{
 		moveBullet(bullet, unit);
-		playerbullet -= 1;
+		playerbullet -= 0.1;
 	}
-		
-		
 		
 		collision(bullet, unit);
 	//health();
