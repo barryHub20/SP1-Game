@@ -1,0 +1,5 @@
+                                       LEFT  : LEFT ARROW KEY
+                                       RIGHT : RIGHT ARROW KEY
+                                       SHOOT : SPACEBAR
+                                       PAUSE : P
+                                       SELECT: ENTER
