@@ -21,7 +21,6 @@ bool keyPressed[K_COUNT];
 COORD charLocation;
 COORD consoleSize;
 COORD playerDirection;
-int ammoSize;
 int enemySize = 8;
 int points;
 int waveCounter;
@@ -30,11 +29,13 @@ double gapPlayer;
 double playerbullet;
 double EnemyBullet;
 double EnemyGap;
-vector<projectile> bullet;
-projectile AddBullet;
-vector<laser> EB; //Enemy Bullet
-laser AddEnemyBullet; //Add Enemy Bullet
 zone playerZone;
+int ammoSize = 40;
+int bulletCounter;
+double bulletSpeed;
+double fireRate;
+double reload;
+vector<projectile> ak47(ammoSize);
 
 void init()
 {
@@ -42,7 +43,7 @@ void init()
     // Set precision for floating point output
     std::cout << std::fixed << std::setprecision(3);
 
-    SetConsoleTitle(L"Hitler");
+    SetConsoleTitle(L"no name");
 
     // Sets the console size, this is the biggest so far.
     setConsoleSize(80, 45);//original: X 79  Y 28
@@ -65,6 +66,10 @@ void init()
 	enemySize = 8;
 	playerZone.Y = 30;
 	waveCounter = 0;
+	bulletCounter = 0;
+	bulletSpeed = 3;
+	fireRate = 0.5;
+	reload = 0;
 	//initialize enemy unit spawn points first time round (total of 7 enemy units), read from text file
 	//set all enemy units to true first time round
 	for(int i=0; i<enemySize; ++i)
@@ -74,7 +79,6 @@ void init()
 		unit[i].location.Y = unit[i].spawnLocation.Y;
 		unit[i].mobile = true;
 		unit[i].time = 0;
-		
 		//set 15 target points for each unit
 		for(int j=0; j<points; ++j)
 		{
@@ -188,73 +192,65 @@ void update(double dt)
 					if((thewall[a].x - thewall[b].x < 5) && (thewall[a].x - thewall[b].x > -5) )//if they are overlapping
 					{
 						thewall[b].loadwall();//re-random
-						a =0;
-						b =0;
+						a = 0;
+						b = 0;
 					}
 				}
 			}
 		}
 	}
-	
+
+	//health();
+
+	//powerup();
+
+	//fires and updates bullets
+	if(reload < fireRate)
+	{
+		reload += deltaTime;
+	}
+
+
 	if (keyPressed[K_SPACE])//Player Presses Space
 	{
-		if (gapPlayer >= 1.2) //Prevent "charging" of bullent
+		if(bulletCounter == ammoSize - 1)
 		{
-			gapPlayer = 0.3;
+			bulletCounter = 0;//reset back to 0, by now bullet 0 has hit target
 		}
 
-		if (gapPlayer > 0.6)//Limit when player can press spacebar
+		if(reload >= fireRate)
 		{
-			AddBullet.xCoordinate = charLocation.X;
-			AddBullet.yCoordinate = charLocation.Y;
-			AddBullet.pressing = true;
-			bullet.push_back(AddBullet);
-			gapPlayer -= 0.6;
+			ak47[bulletCounter].active = true;
+			ak47[bulletCounter].location.X = charLocation.X;
+			ak47[bulletCounter].location.Y = charLocation.Y;
+			++bulletCounter;
+		}
+		
+		if(reload == fireRate)
+		{
+			reload = 0;
+		}
+		else if(reload > fireRate)
+		{
+			reload -= fireRate;
 		}
 	}
 
+	//updates active bullet location
+	bulletActive(ak47, ammoSize, bulletSpeed, deltaTime);
 
 	//updates enemy movement, parameter is enemy unit, double elapsedTime, COORD consoleSize
 	enemyMovement(unit, elapsedTime, consoleSize, enemySize, points, waveCounter, velocity, deltaTime);
 
 	//checks if touched player zone
 	ifTouched(deltaTime, playerZone, unit);
-
-	if (EnemyBullet > 7.5)
-	{
-		for (int o = 0; o < enemySize; o++)
-		{
-			AddEnemyBullet.XC = unit[o].location.X;
-			AddEnemyBullet.YC = unit[o].location.Y + 1;
-			AddEnemyBullet.shooting = true;
-			EB.push_back(AddEnemyBullet);
-			EnemyBullet -= 6.5;
-		}
-	}
-	
-	if (EnemyGap >= 1.5)
-	{
-		MoveEnemyBullet(EB);
-		EnemyGap -= 1.5;
-	}
-		
-		if (playerbullet >= 1) //Limit Bullet speed
-	{
-		moveBullet(bullet, unit);
-		playerbullet -= 0.1;
-	}
-		
-		collision(bullet, unit);
-	//health();
-
-	//powerup();
 }
 
 void render()
 {
      // clear previous screen
     colour(0x0F);
-    cls();
+	cls();
 
     // render time taken to calculate this frame
     gotoXY(70, 0);
@@ -265,7 +261,6 @@ void render()
     colour(0x59);
     std::cout << elapsedTime << "secs" << std::endl;
 
-	
 	// score appearing on screen
 	gotoXY(60, 0);
 	colour(0xffffff00);
@@ -317,11 +312,15 @@ void render()
 		}
 	}	
 
-	showBullet(bullet);
-
-	ShowEnemyBullet(EB);
-	EnemyBulletCollision(EB);
+	for(int i=0; i<ammoSize; ++i)
+	{
+		if(ak47[i].active == true)
+		{
+			printBullet(ak47[i].location);
+		}
+	}
 	//printPowerUp();
+
 
 	//printHealth();
 }

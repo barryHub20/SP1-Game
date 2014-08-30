@@ -50,12 +50,6 @@ void enemyMovement(vector<enemy>& unit, double elapsedTime, COORD consoleSize, i
 
 void enemyUnitAi(double elapsedTime, enemy& unit, double velocity, int numberOfPoints, double frameTime)
 {
-	/**
-	if(unit.location.Y != unit.point[unit.count].Y && elapsedTime >= unit.time)
- 	{
- 		unit.time = elapsedTime + velocity;
- 		unit.location.Y++;
- 	}/**/
 	if(unit.time < velocity)
 	{
 		unit.time += frameTime;//frameTime is deltaTime, counts time for each frame so is accurate with FPS
